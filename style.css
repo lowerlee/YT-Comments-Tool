@@ -1,0 +1,36 @@
+#comment-filter-main-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  
+  #comment-filter-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  #comment-filter-input {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+
+  #comment-filter-comment-count {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: white;
+  }
+  
+  #comment-filter-comments {
+    overflow: auto;
+    max-height: 150px;
+    background-color: white;
+    font-size: 1.3em;
+  }
+  
+  .comment-filter-comment {
+    border-bottom: 1px solid #ccc;
+    padding: 5px;
+  }
+  
