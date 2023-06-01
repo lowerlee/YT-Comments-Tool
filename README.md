@@ -18,7 +18,7 @@
 ```
 2. Profile name style
 
-```cs
+```css
 #author-text.yt-simple-endpoint.ytd-comment-renderer {
     margin-right: 4px;
     color: var(--yt-spec-text-primary);
@@ -30,5 +30,19 @@
     font-size: 1.3rem;
     font-weight: 500;
     line-height: 1.8rem;
+}
+```
+3. Comment time (x years ago)
+
+```css
+.published-time-text.ytd-comment-renderer {
+    --yt-endpoint-color: var(--yt-spec-text-secondary);
+    --yt-endpoint-visited-color: var(--yt-spec-text-secondary);
+    color: var(--yt-spec-text-secondary);
+    white-space: nowrap;
+    font-family: "Roboto","Arial",sans-serif;
+    font-size: 1.2rem;
+    line-height: 1.8rem;
+    font-weight: 400;
 }
 ```
