@@ -1,36 +1,79 @@
 #comment-filter-main-container {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-  }
-  
-  #comment-filter-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-  }
-  
-  #comment-filter-input {
-    flex-grow: 1;
-    margin-right: 10px;
-  }
-
-  #comment-filter-comment-count {
-    margin-bottom: 10px;
-    font-size: 14px;
-    font-weight: bold;
-    background-color: white;
-  }
-  
-  #comment-filter-comments {
-    overflow: auto;
-    max-height: 150px;
-    background-color: white;
-    font-size: 1.3em;
-  }
-  
-  .comment-filter-comment {
-    border-bottom: 1px solid #ccc;
-    padding: 5px;
-  }
-  
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+ 
+#comment-filter-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+ 
+#comment-filter-input {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+ 
+#comment-filter-comment-count {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: white;
+}
+ 
+#comment-filter-comments {
+  overflow: auto;
+  max-height: 150px;
+  background-color: rgb(15,15,15);
+  font-size: 1.3em;
+  color: white;
+}
+ 
+.comment-filter-comment {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  padding: 5px;
+}
+ 
+/* Profile image style */
+.author-thumbnail {
+  margin-right: 16px;
+  border-radius: 50%;
+  background-color: transparent;
+  overflow: hidden;
+  align-self: flex-start;
+}
+ 
+/* Profile name and time container */
+.author-text-container {
+  display: flex;
+  flex-direction: row;  
+  align-items: center; 
+}
+ 
+/* Profile name style */
+.author-text {
+  margin-right: 4px;
+  color: var(--yt-spec-text-primary);
+  margin-bottom: 2px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.8rem;
+}
+ 
+/* Comment time style */
+.published-time-text {
+  --yt-endpoint-color: var(--yt-spec-text-secondary);
+  --yt-endpoint-visited-color: var(--yt-spec-text-secondary);
+  color: var(--yt-spec-text-secondary);
+  white-space: nowrap;
+  font-family: "Roboto","Arial",sans-serif;
+  font-size: 1.2rem;
+  line-height: 1.8rem;
+  font-weight: 400;
+}
