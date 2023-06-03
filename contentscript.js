@@ -57,18 +57,43 @@ fetchComments();
 
 // Function to search comments
 function searchComments() {
-    const searchTerm = searchInput.value.trim().toLowerCase();
+  const searchTerm = searchInput.value.trim().toLowerCase();
 
-    // Clear previous search results
-    commentsContainer.innerHTML = '';
+  // Clear previous search results
+  commentsContainer.innerHTML = '';
 
-    // Filter the stored comments based on the search term
-    for (let i = 0; i < comments.length; i++) {
-        let comment = comments[i].snippet.topLevelComment.snippet.textOriginal.toLowerCase();
-        if (comment.includes(searchTerm)) {
-            // Create and append the comment element as before...
-        }
-    }
+  // Filter the stored comments based on the search term
+  for (let i = 0; i < comments.length; i++) {
+      let comment = comments[i].snippet.topLevelComment.snippet.textOriginal.toLowerCase();
+      if (comment.includes(searchTerm)) {
+          // Create the comment element
+          const commentElement = document.createElement('div');
+          commentElement.className = 'comment-filter-comment';
+
+          // Create the author thumbnail element
+          const authorThumbnail = document.createElement('img');
+          authorThumbnail.className = 'author-thumbnail';
+          authorThumbnail.src = comments[i].snippet.topLevelComment.snippet.authorProfileImageUrl;
+
+          // Create the author name element
+          const authorName = document.createElement('div');
+          authorName.className = 'author-name';
+          authorName.textContent = comments[i].snippet.topLevelComment.snippet.authorDisplayName;
+
+          // Create the comment text element
+          const commentText = document.createElement('div');
+          commentText.className = 'comment-text';
+          commentText.textContent = comments[i].snippet.topLevelComment.snippet.textOriginal;
+
+          // Append the author thumbnail, author name, and comment text to the comment element
+          commentElement.appendChild(authorThumbnail);
+          commentElement.appendChild(authorName);
+          commentElement.appendChild(commentText);
+
+          // Append the comment element to the comments container
+          commentsContainer.appendChild(commentElement);
+      }
+  }
 }
 
 // Function to calculate time ago
