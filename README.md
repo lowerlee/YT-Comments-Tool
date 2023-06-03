@@ -6,8 +6,8 @@
 
 ## Immediate stuff to do
 
-1. Change publish time for the filtered comments to be the same format as the published time for the actual comments in the comment section. In the fomat of either x years ago, x months ago, x weeks ago, x hours ago, x seconds ago.
+1. Cache comments so that way it only loads comments once, and not every search.
 2. Add the likes and dislikes counter.
-3. Get rid of the white line that seperates the filtered comments and increase the top and bottom margins inbetween comments.
+3. Increase the top and bottom margins inbetween comments.
 4. Add something to show reply thread for each filtered comment
 5. Allow search to search not just top level comments, but also the replies.
