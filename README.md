@@ -11,4 +11,4 @@
 3. Increase the top and bottom margins inbetween comments.
 4. Add something to show reply thread for each filtered comment
 5. Allow search to search not just top level comments, but also the replies.
-6. Make profile image size constant. (Seems to change between normal and small, which fucks up the margins inebtween the image and the rest of the comment elements).
+6. Make profile image size constant. (Seems to change between normal and small, which fucks up the margins inbetween the image and the rest of the comment elements).
