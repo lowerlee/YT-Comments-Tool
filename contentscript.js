@@ -80,30 +80,63 @@ function timeAgo(date) {
   return Math.floor(seconds) + " seconds ago";
 }
 
-let commentsCache = {};
-
-function searchComments() {
-  const searchTerm = searchInput.value.trim().toLowerCase();
-
-  // Check if comments have already been loaded
-  if (commentsCache[searchTerm]) {
-    // Load comments from cache
-    commentsContainer.innerHTML = commentsCache[searchTerm];
-  } else {
-    // Clear previous search results
-    commentsContainer.innerHTML = '';
-
-    // Start fetching comments
-    fetchComments().then(() => {
-      // Cache the comments after all comments have been fetched
-      commentsCache[searchTerm] = commentsContainer.innerHTML;
-    });
-  }
-}
+let allCommentsCache = {};
 
 // Fetch comments using the YouTube API script
 var videoId = getYouTubeVideoId();
 var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM'; // replace with your API key
+
+function searchComments() {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  // Check if comments for the current video have already been fetched
+  if (allCommentsCache[videoId]) {
+    // Filter comments from allCommentsCache
+    let filteredComments = allCommentsCache[videoId].filter(comment => comment.text.toLowerCase().includes(searchTerm));
+    // Clear previous search results
+    commentsContainer.innerHTML = '';
+    // Display filtered comments
+    for (let comment of filteredComments) {
+      // Create elements for the comment and add them to commentsContainer
+      var commentElement = document.createElement('p');
+      commentElement.innerText = comment.text;
+
+      // Add author's profile image, profile name, and update date
+      var authorImage = document.createElement('img');
+      authorImage.src = comment.authorProfileImageUrl;
+      authorImage.className = 'author-thumbnail';
+
+      var authorName = document.createElement('p');
+      authorName.innerText = comment.authorDisplayName;
+      authorName.className = 'author-text';
+
+      var updateDate = document.createElement('p');
+      updateDate.innerText = timeAgo(new Date(comment.updatedAt));
+      updateDate.className = 'published-time-text';
+
+      var authorTextContainer = document.createElement('div');
+      authorTextContainer.className = 'author-text-container';
+      authorTextContainer.appendChild(authorName);
+      authorTextContainer.appendChild(updateDate);
+
+      var textContainer = document.createElement('div');
+      textContainer.appendChild(authorTextContainer);
+      textContainer.appendChild(commentElement);
+
+      var commentContainer = document.createElement('div');
+      commentContainer.className = 'comment-filter-comment';
+      commentContainer.appendChild(authorImage);
+      commentContainer.appendChild(textContainer);
+      commentsContainer.appendChild(commentContainer);
+    }
+  } else {
+    // Fetch comments if they haven't been fetched yet
+    fetchComments().then(() => {
+      // Cache the comments after all comments have been fetched
+      allCommentsCache[searchTerm] = commentsContainer.innerHTML;
+    });
+  }
+}
+
 
 function fetchComments(pageToken, currentCount = 0) {
   const searchTerm = searchInput.value.trim().toLowerCase();
@@ -122,6 +155,13 @@ function fetchComments(pageToken, currentCount = 0) {
         // data.items contains the comment threads
         for (var i = 0; i < data.items.length; i++) {
           var comment = data.items[i].snippet.topLevelComment.snippet.textOriginal.toLowerCase();
+
+          // Add all comments to allCommentsCache
+          if (!allCommentsCache[videoId]) {
+            allCommentsCache[videoId] = [];
+          }
+          allCommentsCache[videoId].push(comment);
+
           if (comment.includes(searchTerm)) {
             var commentElement = document.createElement('p');
             commentElement.innerText = comment;
