@@ -80,13 +80,33 @@ function timeAgo(date) {
   return Math.floor(seconds) + " seconds ago";
 }
 
+let commentsCache = {};
+
+function searchComments() {
+  const searchTerm = searchInput.value.trim().toLowerCase();
+
+  // Check if comments have already been loaded
+  if (commentsCache[searchTerm]) {
+    // Load comments from cache
+    commentsContainer.innerHTML = commentsCache[searchTerm];
+  } else {
+    // Clear previous search results
+    commentsContainer.innerHTML = '';
+
+    // Start fetching comments
+    fetchComments();
+  }
+}
+
 // Fetch comments using the YouTube API script
 var videoId = getYouTubeVideoId();
 var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM'; // replace with your API key
 
 function fetchComments(pageToken, currentCount = 0) {
   const searchTerm = searchInput.value.trim().toLowerCase();
-  
+
+  commentsCache[searchTerm] = commentsContainer.innerHTML;
+
   var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
 
   if (pageToken) {
@@ -149,17 +169,6 @@ function fetchComments(pageToken, currentCount = 0) {
   .catch(error => console.error('Error:', error));
 }
 
-// Function to search comments
-function searchComments() {
-  const searchTerm = searchInput.value.trim().toLowerCase();
-
-  // Clear previous search results
-  commentsContainer.innerHTML = '';
-
-  // Start fetching comments
-  fetchComments();
-}
- 
  // Function to wait for an element to be available in the DOM
  function waitForElement(selector, callback) {
   const element = document.querySelector(selector);
