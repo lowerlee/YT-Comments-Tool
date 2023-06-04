@@ -105,8 +105,6 @@ var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM'; // replace with your API
 function fetchComments(pageToken, currentCount = 0) {
   const searchTerm = searchInput.value.trim().toLowerCase();
 
-  commentsCache[searchTerm] = commentsContainer.innerHTML;
-
   var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
 
   if (pageToken) {
@@ -165,6 +163,8 @@ function fetchComments(pageToken, currentCount = 0) {
     else {
       commentCountElement.textContent = 'Total comments: ' + currentCount;
     }
+
+    commentsCache[searchTerm] = commentsContainer.innerHTML;
   })
   .catch(error => console.error('Error:', error));
 }
