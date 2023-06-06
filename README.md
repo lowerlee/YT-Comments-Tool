@@ -4,11 +4,15 @@
 2. Integrate GPT-4 or some other AI model to conduct sentiment analysis for whatever the user wants.
 3. Possibly use langchain to give AI model access tools to search web, make visual graphs, etc. (maybe even agents? we'll see)
 
+## Cache Money Objectives
+
+1. Fetch and cache comments using chrome storage API (sync or local, based on size of all comments)
+2. Determine whether comment cache is stored in chrome.storage.sync or chrome.storage.local
+3. Make a function to get comments from the google storage cache, filter out comments based on search term, then display comments by adding the comment elements (profile picture, profile name, date published, and comment text) into the html UI containers.
+
 ## Immediate stuff to do
 
-1. Fetch and cache comments using chrome storage API
-2. Make a function to get comments from the google storage cache, filter out comments based on search term, then display comments by adding the comment elements (profile picture, profile name, date published, and comment text) into the html UI containers.
-3. Add the likes and dislikes counter.
-4. Increase the top and bottom margins inbetween comments.
-5. Add something to show reply thread for each filtered comment
-6. Allow search to search not just top level comments, but also the replies.
+5. Add the likes and dislikes counter.
+6. Increase the top and bottom margins inbetween comments.
+7. Add something to show reply thread for each filtered comment
+8. Allow search to search not just top level comments, but also the replies.
