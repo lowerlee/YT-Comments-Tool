@@ -101,6 +101,7 @@ function storeComments(comments) {
 }
 
 function fetchComments(pageToken, currentCount = 0) {
+  const searchTerm = searchInput.value.trim().toLowerCase();
   var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
   if (pageToken) {
       url += '&pageToken=' + pageToken;
