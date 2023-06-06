@@ -84,6 +84,36 @@ function timeAgo(date) {
 var videoId = getYouTubeVideoId();
 var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM'; // replace with your API key
 
+// Promisify the chrome.storage.get function
+function getFromStorage(storage, key) {
+  return new Promise((resolve, reject) => {
+      storage.get([key], result => {
+          if (chrome.runtime.lastError || !result[key]) {
+              reject(chrome.runtime.lastError);
+          } else {
+              resolve(JSON.parse(result[key]));
+          }
+      });
+  });
+}
+
+async function fetchComments(pageToken, currentCount = 0) {
+  try {
+      // Try to get comments from chrome.storage.sync
+      let comments = await getFromStorage(chrome.storage.sync, videoId);
+      displayComments(comments);
+  } catch (error) {
+      try {
+          // If not found in chrome.storage.sync, try chrome.storage.local
+          let comments = await getFromStorage(chrome.storage.local, videoId);
+          displayComments(comments);
+      } catch (error) {
+          // If not found in either, fetch and store the comments
+          fetchAndStoreComments(pageToken, currentCount);
+      }
+  }
+}
+
 function storeComments(comments) {
   let data = JSON.stringify(comments);
   let size = data.length * 2; // each character takes 2 bytes
@@ -106,6 +136,7 @@ function fetchComments(pageToken, currentCount = 0) {
   if (pageToken) {
       url += '&pageToken=' + pageToken;
   }
+
   // Fetch the comments using the YouTube API
   fetch(url)
   .then(response => response.json())
@@ -115,10 +146,11 @@ function fetchComments(pageToken, currentCount = 0) {
     for (var i = 0; i < data.items.length; i++) {
       var comment = data.items[i].snippet.topLevelComment.snippet;
       var commentData = {
-          text: comment.textOriginal.toLowerCase(),
-          authorName: comment.authorDisplayName,
-          authorImage: comment.authorProfileImageUrl,
-          publishedAt: comment.publishedAt
+        videoId: videoId,
+        text: comment.textOriginal.toLowerCase(),
+        authorName: comment.authorDisplayName,
+        authorImage: comment.authorProfileImageUrl,
+        publishedAt: comment.publishedAt
       };
       comments.push(commentData);
       if (comment.textOriginal.toLowerCase().includes(searchTerm)) {
