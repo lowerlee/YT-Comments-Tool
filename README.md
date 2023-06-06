@@ -6,8 +6,9 @@
 
 ## Immediate stuff to do
 
-1. Cache comments so that way it only loads comments once, and not every search.
-2. Add the likes and dislikes counter.
-3. Increase the top and bottom margins inbetween comments.
-4. Add something to show reply thread for each filtered comment
-5. Allow search to search not just top level comments, but also the replies.
+1. Fetch and cache comments using chrome storage API
+2. Make a function to get comments from the google storage cache, filter out comments based on search term, then display comments by adding the comment elements (profile picture, profile name, date published, and comment text) into the html UI containers.
+3. Add the likes and dislikes counter.
+4. Increase the top and bottom margins inbetween comments.
+5. Add something to show reply thread for each filtered comment
+6. Allow search to search not just top level comments, but also the replies.
