@@ -4,10 +4,12 @@
     "version": "1.0",
     "description": "A Chrome extension to search and filter YouTube comments.",
     "permissions": [
-      "tabs"
+      "tabs",
+      "storage"
     ],
     "host_permissions": [
       "https://www.googleapis.com/*"
+
     ],
     "content_scripts": [
       {
