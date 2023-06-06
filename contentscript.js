@@ -84,37 +84,57 @@ function timeAgo(date) {
 var videoId = getYouTubeVideoId();
 var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM'; // replace with your API key
 
-function fetchComments(pageToken, currentCount = 0) {
-  const searchTerm = searchInput.value.trim().toLowerCase();
+function storeComments(comments) {
+  let data = JSON.stringify(comments);
+  let size = data.length * 2; // each character takes 2 bytes
 
-  var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
-
-  if (pageToken) {
-    url += '&pageToken=' + pageToken;
+  // chrome.storage.sync limit is 102400 bytes (100KB)
+  if (size < 102400) {
+      chrome.storage.sync.set({ [videoId]: data }, function() {
+          console.log('Data is stored in chrome.storage.sync');
+      });
+  } else {
+      chrome.storage.local.set({ [videoId]: data }, function() {
+          console.log('Data is stored in chrome.storage.local');
+      });
   }
+}
 
+function fetchComments(pageToken, currentCount = 0) {
+  var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
+  if (pageToken) {
+      url += '&pageToken=' + pageToken;
+  }
   // Fetch the comments using the YouTube API
   fetch(url)
   .then(response => response.json())
   .then(data => {
+    let comments = [];
     // data.items contains the comment threads
     for (var i = 0; i < data.items.length; i++) {
-      var comment = data.items[i].snippet.topLevelComment.snippet.textOriginal.toLowerCase();
-      if (comment.includes(searchTerm)) {
+      var comment = data.items[i].snippet.topLevelComment.snippet;
+      var commentData = {
+          text: comment.textOriginal.toLowerCase(),
+          authorName: comment.authorDisplayName,
+          authorImage: comment.authorProfileImageUrl,
+          publishedAt: comment.publishedAt
+      };
+      comments.push(commentData);
+      if (comment.textOriginal.toLowerCase().includes(searchTerm)) {
         var commentElement = document.createElement('p');
-        commentElement.innerText = comment;
+        commentElement.innerText = comment.textOriginal;
 
         // Add author's profile image, profile name, and update date
         var authorImage = document.createElement('img');
-        authorImage.src = data.items[i].snippet.topLevelComment.snippet.authorProfileImageUrl;
+        authorImage.src = comment.authorProfileImageUrl;
         authorImage.className = 'author-thumbnail';
 
         var authorName = document.createElement('p');
-        authorName.innerText = data.items[i].snippet.topLevelComment.snippet.authorDisplayName;
+        authorName.innerText = comment.authorDisplayName;
         authorName.className = 'author-text';
         
         var updateDate = document.createElement('p');
-        updateDate.innerText = timeAgo(new Date(data.items[i].snippet.topLevelComment.snippet.updatedAt));
+        updateDate.innerText = timeAgo(new Date(comment.updatedAt));
         updateDate.className = 'published-time-text';
         
         var authorTextContainer = document.createElement('div');
@@ -133,34 +153,32 @@ function fetchComments(pageToken, currentCount = 0) {
         commentsContainer.appendChild(commentContainer);
       }
     }
-
     currentCount += data.items.length;
     commentCountElement.textContent = 'Comments loaded: ' + currentCount;
-
     // If there's a next page, fetch it
     if (data.nextPageToken) {
-      fetchComments(data.nextPageToken, currentCount);
+        fetchComments(data.nextPageToken, currentCount);
+    } else {
+        commentCountElement.textContent = 'Total comments: ' + currentCount;
     }
-    
-    else {
-      commentCountElement.textContent = 'Total comments: ' + currentCount;
-    }
+    // Store the comments in chrome.storage.sync or chrome.storage.local
+    storeComments(comments);
   })
   .catch(error => console.error('Error:', error));
 }
 
- // Function to search comments
- function searchComments() {
+// Function to search comments
+function searchComments() {
 
   // Clear previous search results
   commentsContainer.innerHTML = '';
 
   // Start fetching comments
   fetchComments();
- }
+}
  
  // Function to wait for an element to be available in the DOM
- function waitForElement(selector, callback) {
+function waitForElement(selector, callback) {
   const element = document.querySelector(selector);
   if (element) {
     callback(element);
@@ -169,4 +187,4 @@ function fetchComments(pageToken, currentCount = 0) {
   else {
     setTimeout(() => waitForElement(selector, callback), 100);
   }
- }
+}
