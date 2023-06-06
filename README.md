@@ -7,7 +7,7 @@
 ## Cache Money Objectives
 
 1. Fetch and cache comments using chrome storage API (sync or local, based on size of all comments)
-2. Determine whether comment cache is stored in chrome.storage.sync or chrome.storage.local
+2. Determine which chrome storage (sync or local) the comments a re stored in the so that they can later be accessed for future searches.
 3. Make a function to get comments from the google storage cache, filter out comments based on search term, then display comments by adding the comment elements (profile picture, profile name, date published, and comment text) into the html UI containers.
 
 ## Immediate stuff to do
