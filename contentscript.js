@@ -97,7 +97,7 @@ function getFromStorage(storage, key) {
   });
 }
 
-async function fetchComments(pageToken, searchInput) {
+async function fetchComments(pageToken) {
   commentsContainer.innerHTML = '';
   const searchTerm = searchInput.value.trim().toLowerCase();
   try {
