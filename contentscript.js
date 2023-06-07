@@ -84,6 +84,75 @@ function timeAgo(date) {
 var videoId = getYouTubeVideoId();
 var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM'; // replace with your API key
 
+// Promisify the chrome.storage.get function
+function getFromStorage(storage, key) {
+  return new Promise((resolve, reject) => {
+    storage.get([key], result => {
+      if (chrome.runtime.lastError || !result[key]) {
+          reject(chrome.runtime.lastError);
+      } else {
+          resolve(JSON.parse(result[key]));
+      }
+    });
+  });
+}
+
+async function fetchComments(pageToken, searchInput) {
+  commentsContainer.innerHTML = '';
+  const searchTerm = searchInput.value.trim().toLowerCase();
+  try {
+    // Try to get comments from chrome.storage.sync
+    let comments = await getFromStorage(chrome.storage.sync, videoId);
+    filterAndDisplayComments(comments, searchTerm);
+  } catch (error) {
+    try {
+        // If not found in chrome.storage.sync, try chrome.storage.local
+        let comments = await getFromStorage(chrome.storage.local, videoId);
+        filterAndDisplayComments(comments, searchTerm);
+    } catch (error) {
+        // If not found in either, fetch and store the comments
+        fetchAndStoreComments(pageToken, searchTerm, currentCount);
+    }
+  }
+}
+
+function filterAndDisplayComments(comments, searchTerm) {
+  comments.forEach(comment => {
+    if (comment.text.includes(searchTerm)) {
+      var commentElement = document.createElement('p');
+      commentElement.innerText = comment.text;
+  
+      // Add author's profile image, profile name, and update date
+      var authorImage = document.createElement('img');
+      authorImage.src = comment.authorImage;
+      authorImage.className = 'author-thumbnail';
+  
+      var authorName = document.createElement('p');
+      authorName.innerText = comment.authorName;
+      authorName.className = 'author-text';
+      
+      var publishedAt = document.createElement('p');
+      publishedAt.innerText = timeAgo(new Date(comment.publishedAt));
+      publishedAt.className = 'published-time-text';
+      
+      var authorTextContainer = document.createElement('div');
+      authorTextContainer.className = 'author-text-container';
+      authorTextContainer.appendChild(authorName);
+      authorTextContainer.appendChild(publishedAt);
+  
+      var textContainer = document.createElement('div');
+      textContainer.appendChild(authorTextContainer);
+      textContainer.appendChild(commentElement);
+  
+      var commentContainer = document.createElement('div');
+      commentContainer.className = 'comment-filter-comment';
+      commentContainer.appendChild(authorImage);
+      commentContainer.appendChild(textContainer);
+      commentsContainer.appendChild(commentContainer);
+    }
+  });
+}
+
 function storeComments(comments) {
   let data = JSON.stringify(comments);
   let size = data.length * 2; // each character takes 2 bytes
@@ -100,9 +169,9 @@ function storeComments(comments) {
   }
 }
 
-function fetchComments(pageToken, currentCount = 0) {
-  const searchTerm = searchInput.value.trim().toLowerCase();
+function fetchAndStoreComments(pageToken, searchTerm, currentCount = 0) {
   var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
+
   if (pageToken) {
       url += '&pageToken=' + pageToken;
   }
@@ -160,7 +229,7 @@ function fetchComments(pageToken, currentCount = 0) {
     commentCountElement.textContent = 'Comments loaded: ' + currentCount;
     // If there's a next page, fetch it
     if (data.nextPageToken) {
-        fetchComments(data.nextPageToken, currentCount);
+      fetchAndStoreComments(data.nextPageToken, currentCount);
     } else {
         commentCountElement.textContent = 'Total comments: ' + currentCount;
     }
@@ -172,22 +241,21 @@ function fetchComments(pageToken, currentCount = 0) {
 
 // Function to search comments
 function searchComments() {
+  // Log the searchInput object to the console
+  console.log('searchInput:', searchInput);
 
   // Clear previous search results
   commentsContainer.innerHTML = '';
-
   // Start fetching comments
   fetchComments();
 }
- 
+
  // Function to wait for an element to be available in the DOM
 function waitForElement(selector, callback) {
   const element = document.querySelector(selector);
   if (element) {
     callback(element);
-  }
-
-  else {
+  } else {
     setTimeout(() => waitForElement(selector, callback), 100);
   }
 }
