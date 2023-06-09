@@ -100,25 +100,28 @@ function searchComments() {
   // Promisify the chrome.storage.get function
   function getFromStorage(storage) {
     return new Promise((resolve, reject) => {
-        storage.get(result => {
-            if (chrome.runtime.lastError) {
-                reject(chrome.runtime.lastError);
-            } else {
-                resolve(JSON.parse(result));
-            }
-        });
+      storage.get(result => {
+        if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+        } else {
+            resolve(JSON.parse(result));
+        }
+      });
     });
   }
   
   async function checkCommentCache(pageToken, currentCount = 0) {
     const searchTerm = searchInput.value.trim().toLowerCase();
     try {
-        // Try to get comments from chrome.storage.sync
-        let comments = await getFromStorage(chrome.storage.session);
-        displayComments(comments, searchTerm);
+      // Try to get comments from chrome.storage.sync
+      let comments = await getFromStorage(chrome.storage.session);
+      let commentsJSON = JSON.stringify(comments);
+      let size = commentsJSON.length * 2; // each character takes 2 bytes
+      testElement.textContent = 'Comment Array (images, names, publishdate, and comment text) JSON Size (Bytes): ' + size;
+      displayComments(comments, searchTerm);
     } catch (error) {
-            // If not found, fetch and store the comments
-            fetchComments(pageToken, currentCount, searchTerm);
+        // If not found, fetch and store the comments
+        fetchComments(pageToken, currentCount, searchTerm);
       }
   }
 
@@ -166,8 +169,6 @@ function searchComments() {
   // Stores comment array in chrome.storage.session after converting to JSON
   function storeComments(comments) {
     let data = JSON.stringify(comments);
-    let size = data.length * 2; // each character takes 2 bytes
-    testElement.textContent = 'Comment Array (images, names, publishdate, and comment text) JSON Size (Bytes): ' + size;
     chrome.storage.session.set({ [videoId]: data }, function() {
       console.log('Data stored in chrome.storage.session')
     })
