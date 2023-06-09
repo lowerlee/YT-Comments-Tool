@@ -14,6 +14,13 @@
   flex-grow: 1;
   margin-right: 10px;
 }
+
+#test{
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: white;
+}
  
 #comment-filter-comment-count {
   margin-bottom: 10px;
