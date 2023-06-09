@@ -131,36 +131,40 @@ function searchComments() {
         comment.textOriginal.toLowerCase().includes(searchTerm)
     );
 
-    // Add author's comment text, profile image, profile name, and publish date
-    var commentElement = document.createElement('p');
-    commentElement.innerText = filteredComments.text;
+    // Iterate over each comment
+    filteredComments.forEach(comment => {
 
-    var authorImage = document.createElement('img');
-    authorImage.src = filteredComments.authorImage;
-    authorImage.className = 'author-thumbnail';
+      // Add author's comment text, profile image, profile name, and publish date
+      var commentElement = document.createElement('p');
+      commentElement.innerText = comment.text;
 
-    var authorName = document.createElement('p');
-    authorName.innerText = filteredComments.authorName;
-    authorName.className = 'author-text';
-    
-    var updateDate = document.createElement('p');
-    updateDate.innerText = timeAgo(new Date(filteredComments.publishedAt));
-    updateDate.className = 'published-time-text';
-    
-    var authorTextContainer = document.createElement('div');
-    authorTextContainer.className = 'author-text-container';
-    authorTextContainer.appendChild(authorName);
-    authorTextContainer.appendChild(updateDate);
+      var authorImage = document.createElement('img');
+      authorImage.src = comment.authorImage;
+      authorImage.className = 'author-thumbnail';
 
-    var textContainer = document.createElement('div');
-    textContainer.appendChild(authorTextContainer);
-    textContainer.appendChild(commentElement);
+      var authorName = document.createElement('p');
+      authorName.innerText = comment.authorName;
+      authorName.className = 'author-text';
+      
+      var updateDate = document.createElement('p');
+      updateDate.innerText = timeAgo(new Date(comment.publishedAt));
+      updateDate.className = 'published-time-text';
+      
+      var authorTextContainer = document.createElement('div');
+      authorTextContainer.className = 'author-text-container';
+      authorTextContainer.appendChild(authorName);
+      authorTextContainer.appendChild(updateDate);
 
-    var commentContainer = document.createElement('div');
-    commentContainer.className = 'comment-filter-comment';
-    commentContainer.appendChild(authorImage);
-    commentContainer.appendChild(textContainer);
-    commentContainer.appendChild(commentContainer);
+      var textContainer = document.createElement('div');
+      textContainer.appendChild(authorTextContainer);
+      textContainer.appendChild(commentElement);
+
+      var commentContainer = document.createElement('div');
+      commentContainer.className = 'comment-filter-comment';
+      commentContainer.appendChild(authorImage);
+      commentContainer.appendChild(textContainer);
+      commentsContainer.appendChild(commentContainer);
+    });
 
     // Update the comment count
     commentCountElement.textContent = 'Total comments: ' + filteredComments.length;
@@ -226,7 +230,7 @@ function searchComments() {
           commentContainer.className = 'comment-filter-comment';
           commentContainer.appendChild(authorImage);
           commentContainer.appendChild(textContainer);
-          commentContainer.appendChild(commentContainer);
+          commentsContainer.appendChild(commentContainer);
         }
       }
 
