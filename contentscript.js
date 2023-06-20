@@ -86,6 +86,49 @@ function timeAgo(date) {
   return Math.floor(seconds) + " seconds ago";
 }
 
+// Fetch comments using the YouTube API script
+var videoId = getYouTubeVideoId();
+var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM';
+
+function fetchCommentsfromYTAPI(videoId, apiKey, pageToken) {
+
+  var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
+
+  if (pageToken) {
+    url += '&pageToken=' + pageToken;
+  }
+
+  fetch(url)
+  .then(response => response.json())
+  .then(data => {
+    let comments = [];
+    for (var i = 0; i < data.items.length; i++) {
+      var comment = data.items[i].snippet.topLevelComment.snippet;
+      var commentData = {
+        text: comment.textOriginal.toLowerCase(),
+        authorName: comment.authorDisplayName,
+        authorImage: comment.authorProfileImageUrl,
+        publishedAt: comment.publishedAt
+      };
+      comments.push(commentData);
+
+      // Store the comments in chrome.storage.session
+      chrome.storage.session.set({[videoId]: comments}, function() {
+        console.log('Comments are stored in session storage.');
+      });
+    }
+  })
+
+  // If there's a next page, fetch it
+  if (data.nextPageToken) {
+    fetchCommentsfromYTAPI(videoId, apiKey, data.nextPageToken);
+  }
+
+  console.log("Comments fetched from YT API");
+}
+
+
+
 // Function to search comments
 function searchComments() {
   const searchTerm = searchInput.value.trim().toLowerCase();
