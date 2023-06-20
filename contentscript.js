@@ -128,7 +128,7 @@ function searchComments() {
   function displayComments(comments, searchTerm) {
     // Filter comments based on the search term
     const filteredComments = comments.filter(comment => 
-        comment.textOriginal.toLowerCase().includes(searchTerm)
+      comment.textOriginal.toLowerCase().includes(searchTerm)
     );
 
     // Iterate over each comment
@@ -252,10 +252,10 @@ function searchComments() {
   }
   // Start fetching comments
   checkCommentCache();
- }
+}
  
- // Function to wait for an element to be available in the DOM
- function waitForElement(selector, callback) {
+// Function to wait for an element to be available in the DOM
+function waitForElement(selector, callback) {
   const element = document.querySelector(selector);
   if (element) {
     callback(element);
@@ -264,4 +264,4 @@ function searchComments() {
   else {
     setTimeout(() => waitForElement(selector, callback), 100);
   }
- }
+}
