@@ -136,60 +136,6 @@ function searchComments() {
   // Clear previous search results
   commentsContainer.innerHTML = '';
 
-  function getCommentsFromStorage(videoId) {
-    return new Promise((resolve, reject) => {
-      chrome.storage.session.get([videoId], function(result) {
-        if (chrome.runtime.lastError) {
-          reject(chrome.runtime.lastError);
-        } else {
-          resolve(result[videoId]);
-        }
-      });
-    });
-  }
-
-
-}
-
-// Function to search comments
-function searchComments() {
-  const searchTerm = searchInput.value.trim().toLowerCase();
-
-  // Clear previous search results
-  commentsContainer.innerHTML = '';
-
-  // Fetch comments using the YouTube API script
-  var videoId = getYouTubeVideoId();
-  var apiKey = 'AIzaSyBXXFXlhx29wNP2egXR4IvKmSTH5h9nyZM';
-
-  // Promisify the chrome.storage.get function
-  function getFromStorage(storage) {
-    return new Promise((resolve, reject) => {
-      storage.get(result => {
-        if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-        } else {
-            resolve(JSON.parse(result));
-        }
-      });
-    });
-  }
-  
-  async function checkCommentCache(pageToken, currentCount = 0) {
-    const searchTerm = searchInput.value.trim().toLowerCase();
-    try {
-      // Try to get comments from chrome.storage.sync
-      let comments = await getFromStorage(chrome.storage.session);
-      let commentsJSON = JSON.stringify(comments);
-      let size = commentsJSON.length * 2; // each character takes 2 bytes
-      testElement.textContent = 'Comment Array (images, names, publishdate, and comment text) JSON Size (Bytes): ' + size;
-      displayComments(comments, searchTerm);
-    } catch (error) {
-        // If not found, fetch and store the comments
-        fetchComments(pageToken, currentCount, searchTerm);
-      }
-  }
-
   function displayComments(comments, searchTerm) {
     // Filter comments based on the search term
     const filteredComments = comments.filter(comment => 
@@ -235,90 +181,35 @@ function searchComments() {
     commentCountElement.textContent = 'Total comments: ' + filteredComments.length;
   }
 
-  // Stores comment array in chrome.storage.session after converting to JSON
-  function storeComments(comments) {
-    let data = JSON.stringify(comments);
-    chrome.storage.session.set({ [videoId]: data }, function() {
-      console.log('Data stored in chrome.storage.session')
-    })
-  }
-
-  function fetchComments(pageToken, currentCount = 0) {
-    var url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=' + videoId + '&key=' + apiKey;
-
-    if (pageToken) {
-      url += '&pageToken=' + pageToken;
-    }
-
-    // Fetch the comments using the YouTube API (Should only do this once when first loading the comments, needs a conditional check)
-    fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      let comments = [];
-      // data.items contains the comment threads
-      for (var i = 0; i < data.items.length; i++) {
-        var comment = data.items[i].snippet.topLevelComment.snippet;
-        var commentData = {
-          text: comment.textOriginal.toLowerCase(),
-          authorName: comment.authorDisplayName,
-          authorImage: comment.authorProfileImageUrl,
-          publishedAt: comment.publishedAt
-        };
-        comments.push(commentData);
-        if (comment.textOriginal.toLowerCase().includes(searchTerm)) {
-          // Add author's comment text, profile image, profile name, and publish date
-          var commentElement = document.createElement('p');
-          commentElement.innerText = comment.textOriginal.toLowerCase();
-
-          var authorImage = document.createElement('img');
-          authorImage.src = comment.authorProfileImageUrl;
-          authorImage.className = 'author-thumbnail';
-
-          var authorName = document.createElement('p');
-          authorName.innerText = comment.authorDisplayName;
-          authorName.className = 'author-text';
-          
-          var updateDate = document.createElement('p');
-          updateDate.innerText = timeAgo(new Date(comment.updatedAt));
-          updateDate.className = 'published-time-text';
-          
-          var authorTextContainer = document.createElement('div');
-          authorTextContainer.className = 'author-text-container';
-          authorTextContainer.appendChild(authorName);
-          authorTextContainer.appendChild(updateDate);
-
-          var textContainer = document.createElement('div');
-          textContainer.appendChild(authorTextContainer);
-          textContainer.appendChild(commentElement);
-
-          var commentContainer = document.createElement('div');
-          commentContainer.className = 'comment-filter-comment';
-          commentContainer.appendChild(authorImage);
-          commentContainer.appendChild(textContainer);
-          commentsContainer.appendChild(commentContainer);
+  function getCommentsFromStorage(videoId) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.session.get([videoId], function(result) {
+        if (chrome.runtime.lastError) {
+          reject(chrome.runtime.lastError);
+        } else {
+          resolve(result[videoId]);
         }
-      }
-
-      currentCount += data.items.length;
-      commentCountElement.textContent = 'Comments loaded: ' + currentCount;
-
-      // If there's a next page, fetch it
-      if (data.nextPageToken) {
-        fetchComments(data.nextPageToken, currentCount);
-      }
-      
-      else {
-        commentCountElement.textContent = 'Total comments: ' + currentCount;
-      }
-
-      storeComments(comments);
-    })
-    .catch(error => console.error('Error:', error));
+      });
+    });
   }
-  // Start fetching comments
-  checkCommentCache();
+
+  async function checkCommentCache(pageToken) {
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    try {
+      // Try to get comments from chrome.storage.sync
+      let comments = await getCommentsFromStorage(chrome.storage.session);
+      let size = comments.length * 2; // each character takes 2 bytes
+      testElement.textContent = 'Comment Array (images, names, publishdate, and comment text) JSON Size (Bytes): ' + size;
+      displayComments(comments, searchTerm);
+    } catch (error) {
+        // If not found, fetch and store the comments
+        fetchCommentsfromYTAPI(videoId, apiKey, pageToken);
+      }
+  }
+
+  checkCommentCache()
 }
- 
+
 // Function to wait for an element to be available in the DOM
 function waitForElement(selector, callback) {
   const element = document.querySelector(selector);
