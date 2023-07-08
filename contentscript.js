@@ -2,55 +2,55 @@
 function getYouTubeVideoId() {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get('v');
- }
+}
  
- // Create the main container element
- const mainContainer = document.createElement('div');
- mainContainer.id = 'comment-filter-main-container';
+// Create the main container element
+const mainContainer = document.createElement('div');
+mainContainer.id = 'comment-filter-main-container';
+
+// Create the comment count element
+const commentCountElement = document.createElement('div');
+commentCountElement.id = 'comment-filter-comment-count';
+commentCountElement.textContent = 'Loading comments...';
+
+// Create the search container element
+const searchContainer = document.createElement('div');
+searchContainer.id = 'comment-filter-container';
+
+// Create the search input element
+const searchInput = document.createElement('input');
+searchInput.type = 'text';
+searchInput.placeholder = 'Search comments...';
+searchInput.id = 'comment-filter-input';
+
+// Create the search button element
+const searchButton = document.createElement('button');
+searchButton.innerText = 'Search';
+searchButton.id = 'comment-filter-button';
+
+// Append the UI elements to the search container
+searchContainer.appendChild(searchInput);
+searchContainer.appendChild(searchButton);
+
+// Create the comments container element
+const commentsContainer = document.createElement('div');
+commentsContainer.id = 'comment-filter-comments';
+
+// Append the comment count element, search container, and comments container to the main container
+mainContainer.appendChild(commentCountElement);
+mainContainer.appendChild(searchContainer);
+mainContainer.appendChild(commentsContainer);
  
- // Create the comment count element
- const commentCountElement = document.createElement('div');
- commentCountElement.id = 'comment-filter-comment-count';
- commentCountElement.textContent = 'Loading comments...';
- 
- // Create the search container element
- const searchContainer = document.createElement('div');
- searchContainer.id = 'comment-filter-container';
- 
- // Create the search input element
- const searchInput = document.createElement('input');
- searchInput.type = 'text';
- searchInput.placeholder = 'Search comments...';
- searchInput.id = 'comment-filter-input';
- 
- // Create the search button element
- const searchButton = document.createElement('button');
- searchButton.innerText = 'Search';
- searchButton.id = 'comment-filter-button';
- 
- // Append the UI elements to the search container
- searchContainer.appendChild(searchInput);
- searchContainer.appendChild(searchButton);
- 
- // Create the comments container element
- const commentsContainer = document.createElement('div');
- commentsContainer.id = 'comment-filter-comments';
- 
- // Append the comment count element, search container, and comments container to the main container
- mainContainer.appendChild(commentCountElement);
- mainContainer.appendChild(searchContainer);
- mainContainer.appendChild(commentsContainer);
- 
- // Wait for the comment section element to be available
- waitForElement('#comments', (commentSection) => {
+// Wait for the comment section element to be available
+waitForElement('#comments', (commentSection) => {
   // Insert the main container before the comment section
   commentSection.parentNode.insertBefore(mainContainer, commentSection);
   // Add event listener to the search button
   searchButton.addEventListener('click', searchComments);
- });
+});
  
- // Function to search comments
- function searchComments() {
+// Function to search comments
+function searchComments() {
   const searchTerm = searchInput.value.trim().toLowerCase();
 
   // Clear previous search results
@@ -155,10 +155,10 @@ function getYouTubeVideoId() {
   }
   // Start fetching comments
   fetchComments();
- }
+}
  
- // Function to wait for an element to be available in the DOM
- function waitForElement(selector, callback) {
+// Function to wait for an element to be available in the DOM
+function waitForElement(selector, callback) {
   const element = document.querySelector(selector);
   if (element) {
     callback(element);
@@ -167,4 +167,4 @@ function getYouTubeVideoId() {
   else {
     setTimeout(() => waitForElement(selector, callback), 100);
   }
- }
+}
